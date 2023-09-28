@@ -19,7 +19,7 @@ export default function App() {
                 year={selectedYear}
             />
             {selectedYear} {selectedMonth}
-            {isModalOpen && <AddInvoiceModal />}
+            {isModalOpen && <AddInvoiceModal modalOpen={setIsModalOpen} />}
             {!isModalOpen && (
                 <button
                     onClick={() => setIsModalOpen(true)}

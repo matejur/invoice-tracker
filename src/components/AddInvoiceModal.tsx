@@ -1,21 +1,38 @@
 import { useState } from "react";
 import { open } from "@tauri-apps/api/dialog";
+import { invoke } from "@tauri-apps/api/tauri";
+import { join } from "@tauri-apps/api/path";
+import { copyFile, BaseDirectory } from "@tauri-apps/api/fs";
+import { Invoice } from "../lib/types";
+import { insertInvoice } from "../lib/db";
 
-export default function AddInvoiceModal() {
+export default function AddInvoiceModal({
+    modalOpen,
+}: {
+    modalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
     const [manualEntry, setManualEntry] = useState<boolean>(false);
 
-    const [company, setCompany] = useState<string>();
-    const [amount, setAmount] = useState<string>();
-    const [month, setMonth] = useState<string>();
-    const [year, setYear] = useState<string>();
+    const [company, setCompany] = useState<string>("");
+    const [amount, setAmount] = useState<string>("");
+    const [month, setMonth] = useState<string>("0");
+    const [year, setYear] = useState<string>("");
 
-    const [xml, setXml] = useState<string>();
-    const [pdf, setPdf] = useState<string>();
+    const [xmlPath, setXmlPath] = useState<string>();
+    const [pdfPath, setPdfPath] = useState<string>();
 
     const [error, setError] = useState<string>();
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        setError("");
+
+        let invoice = {
+            company: company,
+            amount: parseFloat(amount.replace(",", ".")),
+            month: parseInt(month),
+            year: parseInt(year),
+        };
 
         if (manualEntry) {
             if (!company || !amount || !month || !year) {
@@ -23,10 +40,32 @@ export default function AddInvoiceModal() {
                 return;
             }
         } else {
-            if (!xml) {
+            if (!xmlPath) {
                 setError("Izberite XML datoteko!");
                 return;
             }
+
+            try {
+                invoice = await invoke<Invoice>("parse_xml", { path: xmlPath });
+            } catch (e) {
+                setError("Napaka pri branju XML datoteke!");
+                return;
+            }
+        }
+
+        let pdfPathNew = null;
+        if (pdfPath) {
+            let uuid = crypto.randomUUID();
+            pdfPathNew = await join("pdfs", uuid + ".pdf");
+            await copyFile(pdfPath, pdfPathNew, { dir: BaseDirectory.AppData });
+        }
+
+        const result = await insertInvoice(invoice, pdfPathNew);
+
+        if (result.lastInsertId > 0) {
+            modalOpen(false);
+        } else {
+            setError("Napaka pri vnosu v bazo!");
         }
     }
 
@@ -107,7 +146,7 @@ export default function AddInvoiceModal() {
                                         onChange={(e) => {
                                             const value = e.target.value;
 
-                                            if (/^\d*$/.test(value)) {
+                                            if (/^\d{0,4}$/.test(value)) {
                                                 setYear(value);
                                             }
                                         }}
@@ -136,14 +175,14 @@ export default function AddInvoiceModal() {
                                                 result !== undefined &&
                                                 typeof result === "string"
                                             ) {
-                                                setXml(result);
+                                                setXmlPath(result);
                                             }
                                         });
                                     }}
                                 >
                                     Izberi datoteko
                                 </button>
-                                {xml}
+                                {xmlPath}
                             </div>
                         )}
 
@@ -167,19 +206,28 @@ export default function AddInvoiceModal() {
                                             result !== undefined &&
                                             typeof result === "string"
                                         ) {
-                                            setPdf(result);
+                                            setPdfPath(result);
                                         }
                                     });
                                 }}
                             >
                                 Izberi datoteko
                             </button>
-                            {pdf}
+                            {pdfPath}
                         </div>
                         {error && <p className="text-red-500">{error}</p>}
-                        <button className="p-3 mt-4 bg-slate-100 border border-gray-300 rounded-lg">
-                            Dodaj
-                        </button>
+                        <div className="flex justify-between">
+                            <button
+                                type="button"
+                                onClick={() => modalOpen(false)}
+                                className="p-3 mt-4 bg-red-300 border border-red-400 rounded-lg"
+                            >
+                                Prekliči
+                            </button>
+                            <button className="p-3 mt-4 bg-green-300 border border-green-400 rounded-lg">
+                                Dodaj
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

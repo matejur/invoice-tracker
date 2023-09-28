@@ -1,5 +1,5 @@
-import { invoke } from "@tauri-apps/api/tauri";
 import React, { useEffect, useState } from "react";
+import { getYears } from "../lib/db";
 
 export default function YearSidebar({
     select_callback,
@@ -17,7 +17,7 @@ export default function YearSidebar({
     }
 
     useEffect(() => {
-        invoke<number[]>("get_years").then(setYears).catch(console.error);
+        getYears().then(setYears).catch(console.error);
     }, []);
 
     return (

@@ -1,5 +1,5 @@
-import { invoke } from "@tauri-apps/api/tauri";
 import { useEffect, useState } from "react";
+import { getMonths } from "../lib/db";
 
 const NUM_TO_NAME = [
     "Januar",
@@ -33,9 +33,7 @@ export default function MonthSidebar({
 
     useEffect(() => {
         onMonthSelect(undefined);
-        invoke<number[]>("get_months", { year: year })
-            .then(setMonths)
-            .catch(console.error);
+        getMonths(year).then(setMonths).catch(console.error);
     }, [year]);
 
     return (
