@@ -11,6 +11,7 @@ pub struct Invoice {
     month: i32,
     company: String,
     amount: f32,
+    pdf_path: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -134,6 +135,7 @@ pub fn parse_xml_file(path: &str) -> Result<Invoice, Box<dyn Error>> {
         month: date.month,
         company,
         amount,
+        pdf_path: None,
     };
 
     Ok(invoice)

@@ -3,4 +3,5 @@ export interface Invoice {
     company: string;
     month: number;
     year: number;
+    pdf_path: string | null;
 }

@@ -37,11 +37,24 @@ async function getMonths(year: number) {
     return months.map((row) => row.month);
 }
 
-async function insertInvoice(invoice: Invoice, pdfPath: string | null) {
+async function insertInvoice(invoice: Invoice) {
     return await db.execute(
         "INSERT INTO invoice (company, amount, month, year, pdfPath) VALUES (?, ?, ?, ?, ?)",
-        [invoice.company, invoice.amount, invoice.month, invoice.year, pdfPath]
+        [
+            invoice.company,
+            invoice.amount,
+            invoice.month,
+            invoice.year,
+            invoice.pdf_path,
+        ]
     );
 }
 
-export { getYears, getMonths, insertInvoice };
+async function getInvoicesForYear(year: number): Promise<Invoice[]> {
+    return await db.select(
+        "SELECT * FROM invoice WHERE year = ? ORDER BY month ASC",
+        [year]
+    );
+}
+
+export { getYears, getMonths, insertInvoice, getInvoicesForYear };

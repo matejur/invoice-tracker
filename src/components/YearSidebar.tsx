@@ -3,8 +3,10 @@ import { getYears } from "../lib/db";
 
 export default function YearSidebar({
     select_callback,
+    isModalOpen,
 }: {
     select_callback: React.Dispatch<React.SetStateAction<number>>;
+    isModalOpen: boolean;
 }) {
     const [years, setYears] = useState<number[]>([]);
     const [selectedYear, setSelectedYear] = useState<number>(
@@ -18,7 +20,7 @@ export default function YearSidebar({
 
     useEffect(() => {
         getYears().then(setYears).catch(console.error);
-    }, []);
+    }, [isModalOpen]);
 
     return (
         <div className="sidebar">

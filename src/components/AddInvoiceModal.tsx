@@ -27,11 +27,12 @@ export default function AddInvoiceModal({
         e.preventDefault();
         setError("");
 
-        let invoice = {
+        let invoice: Invoice = {
             company: company,
             amount: parseFloat(amount.replace(",", ".")),
             month: parseInt(month),
             year: parseInt(year),
+            pdf_path: null,
         };
 
         if (manualEntry) {
@@ -60,7 +61,8 @@ export default function AddInvoiceModal({
             await copyFile(pdfPath, pdfPathNew, { dir: BaseDirectory.AppData });
         }
 
-        const result = await insertInvoice(invoice, pdfPathNew);
+        invoice.pdf_path = pdfPathNew;
+        const result = await insertInvoice(invoice);
 
         if (result.lastInsertId > 0) {
             modalOpen(false);
