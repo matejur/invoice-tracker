@@ -7,10 +7,12 @@ export default function MainWindow({
     year,
     month,
     isModalOpen,
+    setOpenPdfPath,
 }: {
     year: number;
     month: number | undefined;
     isModalOpen: boolean;
+    setOpenPdfPath: React.Dispatch<React.SetStateAction<string>>;
 }) {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
 
@@ -18,11 +20,13 @@ export default function MainWindow({
         getInvoicesForYear(year).then(setInvoices).catch(console.error);
     }, [year, month, isModalOpen]);
 
-    console.log(invoices);
-
     return (
         <div className="flex flex-col w-full justify-center items-center">
-            <Table invoices={invoices} />
+            <Table
+                invoices={invoices}
+                setOpenPdfPath={setOpenPdfPath}
+                setInvoices={setInvoices}
+            />
         </div>
     );
 }

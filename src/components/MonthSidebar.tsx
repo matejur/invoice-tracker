@@ -28,10 +28,16 @@ export default function MonthSidebar({
                 return (
                     <button
                         className={`sidebar_button ${
-                            month === selectedMonth ? "bg-gray-400" : ""
+                            month === selectedMonth
+                                ? "bg-gray-400 hover:bg-gray-500"
+                                : "bg-gray-500 hover:bg-gray-400"
                         }`}
                         key={month}
-                        onClick={() => onMonthSelect(month)}
+                        onClick={() =>
+                            onMonthSelect(
+                                month != selectedMonth ? month : undefined
+                            )
+                        }
                     >
                         {NUM_TO_NAME[month]}
                     </button>
