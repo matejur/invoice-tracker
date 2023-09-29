@@ -132,7 +132,7 @@ pub fn parse_xml_file(path: &str) -> Result<Invoice, Box<dyn Error>> {
 
     let invoice = Invoice {
         year: date.year,
-        month: date.month,
+        month: date.month - 1,
         company,
         amount,
         pdf_path: None,

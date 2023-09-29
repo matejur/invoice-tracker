@@ -5,6 +5,7 @@ import { join } from "@tauri-apps/api/path";
 import { copyFile, BaseDirectory } from "@tauri-apps/api/fs";
 import { Invoice } from "../lib/types";
 import { insertInvoice } from "../lib/db";
+import { NUM_TO_NAME } from "../lib/constants";
 
 export default function AddInvoiceModal({
     modalOpen,
@@ -28,11 +29,12 @@ export default function AddInvoiceModal({
         setError("");
 
         let invoice: Invoice = {
+            id: -1,
             company: company,
             amount: parseFloat(amount.replace(",", ".")),
             month: parseInt(month),
             year: parseInt(year),
-            pdf_path: null,
+            pdfPath: null,
         };
 
         if (manualEntry) {
@@ -61,7 +63,8 @@ export default function AddInvoiceModal({
             await copyFile(pdfPath, pdfPathNew, { dir: BaseDirectory.AppData });
         }
 
-        invoice.pdf_path = pdfPathNew;
+        invoice.pdfPath = pdfPathNew;
+        invoice.amount = parseFloat(invoice.amount.toFixed(2));
         const result = await insertInvoice(invoice);
 
         if (result.lastInsertId > 0) {
@@ -127,18 +130,9 @@ export default function AddInvoiceModal({
                                             setMonth(e.target.value)
                                         }
                                     >
-                                        <option value="0">Januar</option>
-                                        <option value="1">Februar</option>
-                                        <option value="2">Marec</option>
-                                        <option value="3">April</option>
-                                        <option value="4">Maj</option>
-                                        <option value="5">Junij</option>
-                                        <option value="6">Julij</option>
-                                        <option value="7">Avgust</option>
-                                        <option value="8">September</option>
-                                        <option value="9">Oktober</option>
-                                        <option value="10">November</option>
-                                        <option value="11">December</option>
+                                        {NUM_TO_NAME.map((name, i) => (
+                                            <option value={i}>{name}</option>
+                                        ))}
                                     </select>
                                     Leto:
                                     <input

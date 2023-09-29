@@ -45,7 +45,7 @@ async function insertInvoice(invoice: Invoice) {
             invoice.amount,
             invoice.month,
             invoice.year,
-            invoice.pdf_path,
+            invoice.pdfPath,
         ]
     );
 }
@@ -57,4 +57,14 @@ async function getInvoicesForYear(year: number): Promise<Invoice[]> {
     );
 }
 
-export { getYears, getMonths, insertInvoice, getInvoicesForYear };
+async function deleteInvoice(id: number) {
+    return await db.execute("DELETE FROM invoice WHERE id = ?", [id]);
+}
+
+export {
+    getYears,
+    getMonths,
+    insertInvoice,
+    getInvoicesForYear,
+    deleteInvoice,
+};

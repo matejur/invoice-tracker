@@ -1,7 +1,8 @@
 export interface Invoice {
+    id: number;
     amount: number;
     company: string;
     month: number;
     year: number;
-    pdf_path: string | null;
+    pdfPath: string | null;
 }

@@ -1,20 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMonths } from "../lib/db";
-
-const NUM_TO_NAME = [
-    "Januar",
-    "Februar",
-    "Marec",
-    "April",
-    "Maj",
-    "Junij",
-    "Julij",
-    "Avgust",
-    "September",
-    "Oktober",
-    "November",
-    "December",
-];
+import { NUM_TO_NAME } from "../lib/constants";
 
 export default function MonthSidebar({
     select_callback,
